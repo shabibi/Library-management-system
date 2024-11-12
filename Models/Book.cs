@@ -38,6 +38,9 @@ namespace LIBRARY.Models
 
         public Category Category { get; set; }
 
+        public virtual ICollection<Borrow> Borrows { get; set; }
+
+
     
     }
 }

@@ -23,5 +23,7 @@ namespace LIBRARY.Models
 
         public enum Gender { male, female }
         public Gender gender { get; set; }
+
+        public virtual ICollection<Borrow> Borrows { get; set; }
     }
 }

@@ -19,5 +19,7 @@ namespace LIBRARY.Models
 
         [Range(1, int.MaxValue)]
         public int NumberOfBooks { get; set; }
+
+        public virtual ICollection<Book> Books { get; set;}
     }
 }
