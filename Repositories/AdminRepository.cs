@@ -53,6 +53,12 @@ namespace LIBRARY.Repositories
                 _context.SaveChanges();
             }
         }
+        public IEnumerable<Admin> verifyAdmin(string email, string pass)
+        {
+            return _context.Admins
+                    .Where(e => e.Email == email && e.Password ==pass)
+                   .ToList();
+        }
 
     }
 }
