@@ -189,7 +189,7 @@ namespace LIBRARY
                         break;
 
                     case 3:
-                    
+                        UpdateBook();
                         break;
 
                     case 4:
@@ -310,6 +310,54 @@ namespace LIBRARY
            
         }
 
+        //update books by book name
+        static void UpdateBook()
+        {
+            Console.WriteLine("Enter book name");
+            string bname = Console.ReadLine();
+            var book = bookRepository.GetBookByName(bname);
+            Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+            Console.WriteLine("Enter your chouse to Edite : ");
+            Console.WriteLine("1. Book Title.\n2. Author. \n3.Price");
+            int choise = handelIntError(Console.ReadLine());
+            switch (choise)
+            {
+                case 1:
+                    Console.WriteLine("Enter New Title");
+                    string title = Console.ReadLine();
+                    book.BTitle = title;
+                    bookRepository.UpdateBookByName(bname);
+                    Console.WriteLine("Book Title updated successfully!\n");
+                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                    break;
+                
+                case 2:
+                    Console.WriteLine("Enter New Author name");
+                    string author = Console.ReadLine();
+                    book.Author = author;
+                    bookRepository.UpdateBookByName(bname);
+                    Console.WriteLine("Book Author updated successfully!\n");
+                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+
+                    break;
+
+                case 3:
+                    Console.WriteLine("Enter New Price");
+                    double price = handelDoubleError( Console.ReadLine());
+                    book.Price = price;
+                    bookRepository.UpdateBookByName(bname);
+                    Console.WriteLine("Book Price updated successfully!\n");
+                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+
+                    break;
+              
+                default:
+                    Console.WriteLine("Incorrect Input.. ");
+                break;
+
+            }
+
+        }
         //Handel input errors
         static int handelIntError(string input)
         {
