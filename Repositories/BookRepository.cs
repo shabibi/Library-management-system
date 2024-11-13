@@ -1,4 +1,5 @@
 ﻿using LIBRARY.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,31 @@ namespace LIBRARY.Repositories
             return _context.Books
                             .Where(b => b.Category.CName == Catg_name)
                             .Count();
+        }
+
+        public void updateCategoryCopyOnDeleting(int cid)
+        {
+            var catg =  _context.Categories.FirstOrDefault(b => b.CID == cid);
+             
+         
+            if (catg != null && catg.NumberOfBooks > 0 )
+            {
+                catg.NumberOfBooks -= 1;
+                _context.Categories.Update(catg);
+                _context.SaveChanges() ;
+            }
+        }
+        public void updateCategoryCopyOnAddingBook(int cid)
+        {
+            var catg = _context.Categories.FirstOrDefault(b => b.CID == cid);
+
+
+            if (catg != null && catg.NumberOfBooks > 0)
+            {
+                catg.NumberOfBooks += 1;
+                _context.Categories.Update(catg);
+                _context.SaveChanges();
+            }
         }
     }
 }
