@@ -185,7 +185,7 @@ namespace LIBRARY
                         break;
 
                     case 2:
-                        //RemoveBook();
+                        RemoveBook();
                         break;
 
                     case 3:
@@ -251,6 +251,7 @@ namespace LIBRARY
             {
                 var book = new Book { BTitle = title, Author = author, Price = price, TotalCopies = totalCopies, BorrowingPeriod = borrowingPeriod ,CID = category };
                 bookRepository.InsertBook(book);
+                bookRepository.updateCategoryCopyOnAddingBook(book.CID);
                 Console.WriteLine("Book added successfully!");
             }
             catch (Exception e)
@@ -260,7 +261,54 @@ namespace LIBRARY
             }
         }
 
-   
+        //Display All Books
+        static void viewAllBooks()
+        {
+            var books = bookRepository.GetAllBooks();
+
+            foreach (var b in books)
+            {
+                Console.WriteLine($"{b.BID}: {b.BTitle} - Author: {b.Author} - Copies: {b.TotalCopies} - Price {b.Price}");
+            }
+        }
+        //Remove Book
+        static void RemoveBook()
+        {
+           viewAllBooks();
+            Console.WriteLine("Enter Book Number");
+            int Bnum = handelIntError(Console.ReadLine());
+            var book= bookRepository.GetAllBooks().FirstOrDefault(b=> b.BID == Bnum);
+            if(book != null)
+            {
+                if (book.BorrowedCopies > 0)
+                    Console.WriteLine("There are borrowed copies of this book. Cannot be deleted");
+
+                else
+                {
+                    try
+                    {
+                        Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                        Console.WriteLine("To Confirm deleting enter 1 ");
+                        string con = Console.ReadLine();
+                        if (con == "1")
+                        {
+                            bookRepository.DeleteBookById(Bnum);
+                            bookRepository.updateCategoryCopyOnDeleting(book.CID);
+                            Console.WriteLine($"{book.BTitle} deleted successfully");
+                        }
+                        else
+                            Console.WriteLine($"{book.BTitle} not deleted");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Faild on deleting this book");
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
+            
+           
+        }
 
         //Handel input errors
         static int handelIntError(string input)
