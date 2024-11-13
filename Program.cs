@@ -193,16 +193,16 @@ namespace LIBRARY
                         break;
 
                     case 4:
-                       
+                        viewAllBooks();
                         break;
                     case 5:
-                        
+                        AddNewCategory();
                         break;
                     case 6:
                         
                         break;
 
-                    case 7:
+                    case 13:
                         ExitFlag = true;
                         break;
 
@@ -264,6 +264,9 @@ namespace LIBRARY
         //Display All Books
         static void viewAllBooks()
         {
+            Console.WriteLine(new string('*', 140));
+            Console.WriteLine("\t\t\t\t\t\t Books Menu\n");
+            Console.WriteLine(new string('*', 140));
             var books = bookRepository.GetAllBooks();
 
             foreach (var b in books)
@@ -274,7 +277,11 @@ namespace LIBRARY
         //Remove Book
         static void RemoveBook()
         {
-           viewAllBooks();
+            Console.WriteLine(new string('*', 140));
+            Console.WriteLine("\t\t\t\t\t\t Removing Book\n");
+            Console.WriteLine(new string('*', 140));
+            viewAllBooks();
+            Console.WriteLine(new string('*', 140));
             Console.WriteLine("Enter Book Number");
             int Bnum = handelIntError(Console.ReadLine());
             var book= bookRepository.GetAllBooks().FirstOrDefault(b=> b.BID == Bnum);
@@ -313,6 +320,9 @@ namespace LIBRARY
         //update books by book name
         static void UpdateBook()
         {
+            Console.WriteLine(new string('*', 140));
+            Console.WriteLine("\t\t\t\t\t\t Update Book\n");
+            Console.WriteLine(new string('*', 140));
             Console.WriteLine("Enter book name");
             string bname = Console.ReadLine();
             var book = bookRepository.GetBookByName(bname);
@@ -358,6 +368,45 @@ namespace LIBRARY
             }
 
         }
+
+        //******************Category*******************
+        static void AddNewCategory()
+        {
+            Console.WriteLine("------------------------Adding New Category-------------------------\n");
+
+            bool flage = false;
+            Console.WriteLine("Enter the Category name\n ");
+            string catgName = Console.ReadLine();
+
+            try
+            {
+                var catgList = categoryRepository.GetAllCategory();
+                if(catgList != null)
+                {
+                    foreach (var c in catgList)
+                    {
+                        if (c.CName == catgName)
+                            flage = true;
+                    }
+                }
+
+                if(flage != true)
+                {
+                    var catg = new Category { CName = catgName };
+                    categoryRepository.InsertCategory(catg);
+                    Console.WriteLine("Category added successfully!");
+                }
+                else
+                    Console.WriteLine("This Category name is exists.. ");
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to add new Category!");
+                Console.WriteLine(e.ToString());
+            }
+        }
+
         //Handel input errors
         static int handelIntError(string input)
         {
