@@ -215,6 +215,12 @@ namespace LIBRARY
                     case 10:
                         UpdateUser();
                         break;
+                    case 11:
+                        RemoveUser();
+                        break;
+                    case 12:
+                        viewAllUsers();
+                        break;
                     case 13:
                         ExitFlag = true;
                         break;
@@ -499,7 +505,141 @@ namespace LIBRARY
 
         }
 
-    
+        //******************User*******************
+        static void AddNewUser()
+        {
+            Console.WriteLine("------------------------Adding User-------------------------\n");
+
+            Console.WriteLine("Enter the following User data\n ");
+
+            bool flage = false;
+
+            Console.WriteLine(" User Name :  ");
+            string userName = Console.ReadLine();
+            var userList = userRepository.GetAllUsers();
+            if (userList != null)
+            {
+                foreach (var u in userList)
+                {
+                    if (u.UName == userName)
+                        flage = true;
+                }
+            }
+
+            if (flage != true)
+            {
+                Console.WriteLine("Passcode :  ");
+                string passcode = Console.ReadLine();
+
+                Console.WriteLine("Gender {0:Male, 1:Femal} :  ");
+                string input = Console.ReadLine();
+                if (Enum.TryParse(input, true, out Gender gender))
+                {
+                    try
+                    {
+                        var user = new User { UName = userName, Passcode = passcode, gender = gender };
+                        userRepository.InsertUser(user);
+                        Console.WriteLine("User added successfully!");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to add new User!");
+                        Console.WriteLine(e.ToString());
+                    }
+
+                }
+                else
+                    Console.WriteLine("Invalid gender input. Please enter a valid option.");
+            }
+            else
+                Console.WriteLine("This User name is already registered .. ");
+          
+        }
+
+        static void viewAllUsers()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Users Menu\n");
+            Console.WriteLine(new string('*', 100));
+            var user = userRepository.GetAllUsers();
+            if (user != null)
+            {
+                foreach (var u in user)
+                {
+                    if (u.gender == 0)
+                        Console.WriteLine($"{u.UID}: {u.UName} - Gender: Male - Passcode : {u.Passcode} ");
+                    else
+                        Console.WriteLine($"{u.UID}: {u.UName} - Gender: Female - Passcode : {u.Passcode}");
+
+                }
+            }
+           
+        }
+
+        static void UpdateUser()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Update User Passcode\n");
+            Console.WriteLine(new string('*', 100));
+            viewAllUsers();
+            Console.WriteLine("Enter User name");
+            string username = Console.ReadLine();
+            var user = userRepository.GetUserByName(username);
+            if (user != null)
+            {
+                Console.WriteLine($"{user.UID}: {user.UName} Passcode: {user.Passcode} ");
+
+                Console.WriteLine("Enter New Passcode");
+                string newPasscode = Console.ReadLine();
+                user.Passcode = newPasscode;
+                userRepository.UpdateUserByName(username);
+                Console.WriteLine("User Passcode updated successfully!\n");
+                Console.WriteLine($"{user.UID}: {user.UName} Passcode: {user.Passcode} ");
+            }
+
+        }
+
+        static void RemoveUser()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Removing User\n");
+            Console.WriteLine(new string('*', 100));
+            viewAllUsers();
+            Console.WriteLine("Enter User Number");
+            int userNum = handelIntError(Console.ReadLine());
+            var user = userRepository.GetAllUsers().FirstOrDefault(u => u.UID == userNum);
+            
+            if (user != null)
+            {
+                try
+                {
+                    if (user.Borrows != null  && userRepository.borrowedCopies(user.UID) > 0)
+                        Console.WriteLine("This user borrowed books. Cannot be deleted");
+                    else
+                    {
+
+                        Console.WriteLine($"{user.UID}: {user.UName} - Gender: Male - Passcode : {user.Passcode} ");
+                        Console.WriteLine("To Confirm deleting enter 1 ");
+                        string con = Console.ReadLine();
+                        if (con == "1")
+                        {
+                            userRepository.DeleteUserById(userNum);
+                            Console.WriteLine($"{user.UName} deleted successfully");
+                        }
+                        else
+                            Console.WriteLine($"{user.UName} not deleted");
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Faild on deleting this user");
+                    Console.WriteLine(e.Message);
+                }
+            }
+          
+        }
+
         //Handel input errors
         static int handelIntError(string input)
         {
