@@ -42,11 +42,12 @@ namespace LIBRARY
                     case 1:
                         adminRegistration();
                         break;
+
                     case 2:
-                   
+                        UserRegistration();
                         break;
 
-                    case 13:
+                    case 3:
                         ExitFlag = true;
                         break;
 
@@ -58,8 +59,10 @@ namespace LIBRARY
 
             } while (ExitFlag != true);
 
-
         }
+
+
+        
 
         //Add new admin or verify admin login
         static void adminRegistration()
@@ -152,7 +155,7 @@ namespace LIBRARY
             } while (ExitFlag != true);
         }
 
-        //Admin menu
+        //******************Admin Menu********************************
         static void adminMenu()
         {
             bool ExitFlag = false;
@@ -236,6 +239,7 @@ namespace LIBRARY
             } while (ExitFlag != true);
 
         }
+
         //******************Book*******************
 
         //Add New Book By Admin
@@ -390,7 +394,7 @@ namespace LIBRARY
 
         }
 
-        //******************Category*******************
+        //******************Category******************
         static void AddNewCategory()
         {
             Console.WriteLine("------------------------Adding New Category-------------------------\n");
@@ -639,6 +643,75 @@ namespace LIBRARY
             }
           
         }
+
+
+        //*******************************User Menu*********************************
+        static void UserRegistration()
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("---------------Welcome---------------");
+                Console.WriteLine("\n\n Enter the number of operation you need :");
+                Console.WriteLine("\n   1- Register");
+                Console.WriteLine("\n   2- Log in");
+                Console.WriteLine("\n   3- Exit");
+
+                int choice = handelIntError(Console.ReadLine());
+
+
+                Console.WriteLine("\n------------------------------------------------\n");
+                //Register new user
+                if (choice == 1)
+                {
+                    Console.Clear();
+                    AddNewUser();
+                    
+                }
+
+                //Verifed user account
+                else if (choice == 2)
+                {
+                    Console.WriteLine("Enter Your Name");
+                    string name = Console.ReadLine();
+
+                    var user = userRepository.GetUserByName(name);
+
+                    Console.Clear();
+                    if (user != null)
+                    {
+                        name = user.UName;
+                        Console.WriteLine($"---------------Welcome {name}---------------");
+
+                        Console.WriteLine("Enter Your Passcode ");
+                        string passcode = Console.ReadLine();
+
+                        if(user.Passcode == passcode)
+                        {
+                            UserMenu();
+                        }
+                        else
+                            Console.WriteLine("Incorrect passcode");
+                    }
+                    else
+                        Console.WriteLine("User Name Not Exist");
+
+                }
+
+                else if (choice == 3)
+                    ExitFlag = false;
+                else
+                    Console.WriteLine("Incorrect Choice..\n ");
+
+                Console.WriteLine("press enter key to continue");
+                string cont = Console.ReadLine();
+
+            } while (ExitFlag != true);
+        }
+
+     
+
 
         //Handel input errors
         static int handelIntError(string input)
