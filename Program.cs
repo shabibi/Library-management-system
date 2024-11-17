@@ -1,7 +1,9 @@
 ﻿using LIBRARY.Models;
 using LIBRARY.Repositories;
 using Microsoft.EntityFrameworkCore.Storage.Json;
+using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 
 namespace LIBRARY
 {
@@ -199,9 +201,20 @@ namespace LIBRARY
                         AddNewCategory();
                         break;
                     case 6:
-                        
+                        UpdateCategory();
                         break;
-
+                    case 7:
+                        RemoveCategory();
+                        break;
+                    case 8:
+                        viewAllCategories();
+                        break;
+                    case 9:
+                        AddNewUser();
+                        break;
+                    case 10:
+                        UpdateUser();
+                        break;
                     case 13:
                         ExitFlag = true;
                         break;
@@ -217,6 +230,7 @@ namespace LIBRARY
             } while (ExitFlag != true);
 
         }
+        //******************Book*******************
 
         //Add New Book By Admin
         static void AddNewBook()
@@ -320,9 +334,10 @@ namespace LIBRARY
         //update books by book name
         static void UpdateBook()
         {
-            Console.WriteLine(new string('*', 140));
+            Console.WriteLine(new string('*', 100));
             Console.WriteLine("\t\t\t\t\t\t Update Book\n");
-            Console.WriteLine(new string('*', 140));
+            Console.WriteLine(new string('*', 100));
+            viewAllBooks();
             Console.WriteLine("Enter book name");
             string bname = Console.ReadLine();
             var book = bookRepository.GetBookByName(bname);
@@ -407,6 +422,84 @@ namespace LIBRARY
             }
         }
 
+        static void UpdateCategory()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Update Category\n");
+            Console.WriteLine(new string('*', 100));
+            viewAllCategories();
+            Console.WriteLine("Enter Category name");
+            string cname = Console.ReadLine();
+            var catg = categoryRepository.GetCategoryByName(cname);
+            if (catg != null)
+            {
+                Console.WriteLine($"{catg.CID}: {catg.CName} ");
+
+                Console.WriteLine("Enter New Category name");
+                string newCatg = Console.ReadLine();
+                catg.CName = newCatg;
+                categoryRepository.UpdateCategoryByName(cname);
+                Console.WriteLine("Category name updated successfully!\n");
+                Console.WriteLine($"{catg.CID}: {catg.CName} ");
+            }
+
+        }
+
+        static void viewAllCategories()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Categories Menu\n");
+            Console.WriteLine(new string('*', 100));
+            var catg = categoryRepository.GetAllCategory();
+
+            foreach (var c in catg)
+            {
+                Console.WriteLine($"{c.CID}: {c.CName} - Number of books: {c.NumberOfBooks}");
+            }
+            Console.WriteLine(new string('*', 100));
+        }
+
+        static void RemoveCategory()
+        {
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Removing Category\n");
+            Console.WriteLine(new string('*', 100));
+            viewAllCategories();
+            Console.WriteLine("Enter Category Number");
+            int Cnum = handelIntError(Console.ReadLine());
+            var catg = categoryRepository.GetAllCategory().FirstOrDefault(c => c.CID == Cnum);
+            if (catg != null)
+            {
+                if (catg.NumberOfBooks > 0)
+                    Console.WriteLine("There are Books registered to this Category. Cannot be deleted");
+
+                else
+                {
+                    try
+                    {
+                        Console.WriteLine($"{catg.CID}: {catg.CName} ");
+                        Console.WriteLine("To Confirm deleting enter 1 ");
+                        string con = Console.ReadLine();
+                        if (con == "1")
+                        {
+                            categoryRepository.DeleteCategoryById(Cnum);
+                            Console.WriteLine($"{catg.CName} deleted successfully");
+                        }
+                        else
+                            Console.WriteLine($"{catg.CName} not deleted");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Faild on deleting this Category");
+                        Console.WriteLine(e.Message);
+                    }
+                }
+            }
+
+
+        }
+
+    
         //Handel input errors
         static int handelIntError(string input)
         {
