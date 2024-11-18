@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+public enum Gender { male, female }
 namespace LIBRARY.Models
 {
+
     public class User
     {
 
@@ -21,7 +23,8 @@ namespace LIBRARY.Models
         [MaxLength(20)]
         public string Passcode { get; set; }
 
-        public enum Gender { male, female }
+
+        [EnumDataType(typeof(Gender))]
         public Gender gender { get; set; }
 
         public virtual ICollection<Borrow> Borrows { get; set; }

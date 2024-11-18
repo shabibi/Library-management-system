@@ -935,13 +935,22 @@ namespace LIBRARY
             try
             {
                 Console.Clear();
-                var user = userRepository.GetAllUsers().FirstOrDefault(u => u.UID == uid);
-                if (user != null)
+
+                // Fetch user details
+                var user = userRepository.GetAllUsers()?.FirstOrDefault(u => u.UID == uid);
+                if (user == null)
                 {
-                    Console.WriteLine("User ID: " + user.UID);
-                    Console.WriteLine("User Name: " + user.UName);
-                    Console.WriteLine("User passcode: " + user.Passcode);
+                    Console.WriteLine("User not found.");
+                    return;
                 }
+
+                // Display user details
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("                     USER PROFILE                         ");
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine($"User ID       : {user.UID}");
+                Console.WriteLine($"User Name     : {user.UName}");
+                Console.WriteLine($"User Passcode : {user.Passcode}");
 
                 Console.WriteLine("\n**********************************************************");
                 Console.WriteLine("                   BORROWING HISTORY                      ");
@@ -949,34 +958,40 @@ namespace LIBRARY
                 Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", "Book ID", "Book Name", "Borrow Date", "Return Date", "Status");
                 Console.WriteLine(new string('-', 90));
 
-                var borrowedBook = borrowRepository.GetAll();
-                if (borrowedBook != null)
+                // Fetch borrowed books
+                var borrowedBooks = borrowRepository.GetAll()?.Where(b => b.UID == uid).ToList();
+                if (borrowedBooks == null || !borrowedBooks.Any())
                 {
-                    foreach (var b in borrowedBook)
+                    Console.WriteLine("No borrowing history available.");
+                    return;
+                }
+
+                foreach (var b in borrowedBooks)
+                {
+                    string bookTitle = b.Book?.BTitle ?? "Unknown";
+                    string borrowDate = b.BDate != null ? b.BDate.ToString("yyyy-MM-dd") : "N/A";
+                    string returnDate = b.RDate != null ? b.RDate.ToString("yyyy-MM-dd") : "N/A";
+                    string status;
+
+                    if (b.IsReturned)
                     {
-                        if (b.UID == uid)
-                        {
-                            if (b.IsReturned == true)
-                            {
-                                if (b.ActualDate > b.RDate)
-                                    Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", b.BID, b.Book.BTitle, "Returned", "Overdue");
-                                else
-                                    Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", b.BID, b.Book.BTitle, "Returned", "On Time");
-
-                            }
-                            else
-                                Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", b.BID, b.Book.BTitle, "Borrowed", b.RDate.ToString("yyyy-MM-dd"));
-
-                        }
-                        Console.WriteLine(new string('-', 90));
+                        status = b.RDate < DateTime.Today ? "Overdue" : "On Time";
+                        Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", b.BID, bookTitle, borrowDate, returnDate, status);
+                    }
+                    else
+                    {
+                        status = "Borrowed";
+                        Console.WriteLine("{0,-10} | {1,-30} | {2,-12} | {3,-15} | {4,-10}", b.BID, bookTitle, borrowDate, returnDate, status);
                     }
                 }
+
+                Console.WriteLine(new string('-', 90));
             }
-              
-            catch (Exception ex) { Console.WriteLine(ex.Message); }
-
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
         }
-
 
         //Handel input errors
         static int handelIntError(string input)

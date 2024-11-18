@@ -17,11 +17,11 @@ namespace LIBRARY.Models
 
         public DateTime RDate { get; set; }
         
-        public DateTime ActualDate { get; set; }
+        public DateTime? ActualDate { get; set; }
 
         public bool IsReturned { get; set; }
         [Range(0,5)]
-        public float Rating { get; set; }
+        public float? Rating { get; set; }
 
         [ForeignKey("Book")]
         public int BID;

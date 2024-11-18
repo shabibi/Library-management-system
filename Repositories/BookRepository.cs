@@ -18,14 +18,14 @@ namespace LIBRARY.Repositories
         }
         public IEnumerable<Book> GetAllBooks()
         {
-            return _context.Books.ToList();
+            return _context.Books.Include(b => b.Borrows).ToList();
         }
 
-        public IEnumerable<Book> GetBookByName(string title)
+        public Book GetBookByName(string title)
         {
             return _context.Books
-                    .Where(e => e.BTitle == title)
-                   .ToList();
+                    .FirstOrDefault(e => e.BTitle == title);
+                  
         }
 
         public void InsertBook(Book book)

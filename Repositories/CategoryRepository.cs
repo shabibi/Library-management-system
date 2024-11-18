@@ -20,11 +20,10 @@ namespace LIBRARY.Repositories
             return _context.Categories.ToList();
         }
 
-        public IEnumerable<Category> GetCategoryByName(string CategoryName)
+        public Category GetCategoryByName(string CategoryName)
         {
             return _context.Categories
-                    .Where(e => e.CName == CategoryName)
-                   .ToList();
+                    .FirstOrDefault(e => e.CName == CategoryName);
         }
 
         public void InsertCategory(Category category)
@@ -52,7 +51,6 @@ namespace LIBRARY.Repositories
                 _context.SaveChanges();
             }
         }
-
 
     }
 }

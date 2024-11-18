@@ -19,15 +19,13 @@ namespace LIBRARY.Repositories
 
         public IEnumerable<Borrow> GetAll()
         {
-            return _context.Borrows.ToList();
+            return _context.Borrows.Include(e => e.Book).Include(e => e.User).ToList();
         }
 
-        public IEnumerable<Borrow> GetBorrowBookByName(string BookName)
+        public Borrow GetBorrowBookByName(string BookName)
         {
             return _context.Borrows
-                    .Include(e => e.Book)
-                    .Where(e => e.Book.BTitle == BookName)
-                    .ToList();
+                    .FirstOrDefault(e => e.Book.BTitle == BookName);
         }
 
         public void Insert(Borrow borrow)
