@@ -1,9 +1,11 @@
 ﻿using LIBRARY.Models;
 using LIBRARY.Repositories;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace LIBRARY
 {
@@ -351,46 +353,59 @@ namespace LIBRARY
             Console.WriteLine("Enter book name");
             string bname = Console.ReadLine();
             var book = bookRepository.GetBookByName(bname);
-            Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
-            Console.WriteLine("Enter your chouse to Edite : ");
-            Console.WriteLine("1. Book Title.\n2. Author. \n3.Price");
-            int choise = handelIntError(Console.ReadLine());
-            switch (choise)
+            if (book != null)
             {
-                case 1:
-                    Console.WriteLine("Enter New Title");
-                    string title = Console.ReadLine();
-                    book.BTitle = title;
-                    bookRepository.UpdateBookByName(bname);
-                    Console.WriteLine("Book Title updated successfully!\n");
-                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
-                    break;
-                
-                case 2:
-                    Console.WriteLine("Enter New Author name");
-                    string author = Console.ReadLine();
-                    book.Author = author;
-                    bookRepository.UpdateBookByName(bname);
-                    Console.WriteLine("Book Author updated successfully!\n");
-                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                Console.WriteLine("Enter your chouse to Edite : ");
+                Console.WriteLine("1. Book Title.\n2. Author. \n3.Price \n4.Copies");
+                int choise = handelIntError(Console.ReadLine());
+                switch (choise)
+                {
+                    case 1:
+                        Console.WriteLine("Enter New Title");
+                        string title = Console.ReadLine();
+                        book.BTitle = title;
+                        bookRepository.UpdateBookByName(bname);
+                        Console.WriteLine("Book Title updated successfully!\n");
+                        Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                        break;
 
-                    break;
+                    case 2:
+                        Console.WriteLine("Enter New Author name");
+                        string author = Console.ReadLine();
+                        book.Author = author;
+                        bookRepository.UpdateBookByName(bname);
+                        Console.WriteLine("Book Author updated successfully!\n");
+                        Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
 
-                case 3:
-                    Console.WriteLine("Enter New Price");
-                    double price = handelDoubleError( Console.ReadLine());
-                    book.Price = price;
-                    bookRepository.UpdateBookByName(bname);
-                    Console.WriteLine("Book Price updated successfully!\n");
-                    Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+                        break;
 
-                    break;
-              
-                default:
-                    Console.WriteLine("Incorrect Input.. ");
-                break;
+                    case 3:
+                        Console.WriteLine("Enter New Price");
+                        double price = handelDoubleError(Console.ReadLine());
+                        book.Price = price;
+                        bookRepository.UpdateBookByName(bname);
+                        Console.WriteLine("Book Price updated successfully!\n");
+                        Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
 
+                        break;
+                    case 4:
+                        Console.WriteLine("Enter New copies number");
+                        int copies = handelIntError(Console.ReadLine());
+                        book.TotalCopies = copies;
+                        bookRepository.UpdateBookByName(bname);
+                        Console.WriteLine("Book copies number updated successfully!\n");
+                        Console.WriteLine($"{book.BID}: {book.BTitle} - Author: {book.Author} - Copies: {book.TotalCopies} - Price {book.Price}");
+
+                        break;
+                    default:
+                        Console.WriteLine("Incorrect Input.. ");
+                        break;
+
+                }
             }
+            else
+                Console.WriteLine("Incorect Book title");
 
         }
 
@@ -689,7 +704,7 @@ namespace LIBRARY
 
                         if(user.Passcode == passcode)
                         {
-                            UserMenu();
+                            UserMenu(user.UID);
                         }
                         else
                             Console.WriteLine("Incorrect passcode");
@@ -710,7 +725,148 @@ namespace LIBRARY
             } while (ExitFlag != true);
         }
 
-     
+        static void UserMenu(int uid)
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("\n\n Enter the number of operation you need :");
+                
+                Console.WriteLine("\n   1 - Display All Books\n");
+
+                Console.WriteLine("\n   2 - Display All Category\n");
+
+                Console.WriteLine("\n   3 - Borrow Book\n");
+                Console.WriteLine("\n   4- Return Book\n");
+                
+                Console.WriteLine("\n   5- Display Profile\n");
+
+                Console.WriteLine("\n   6- Exit");
+
+                int choice = handelIntError(Console.ReadLine());
+                Console.Clear();
+                switch (choice)
+                {
+                    case 1:
+                        viewAllBooks();
+                        break;
+
+                    case 2:
+                        viewAllCategories();
+                        break;
+
+                    case 3:
+                        Borrow(uid);
+                        break;
+
+                    case 4:
+                        ReturnBook(uid);
+                        break;
+                    case 5:
+                        UserProfile(uid);
+                        break;
+                 
+                    case 6:
+                        ExitFlag = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong");
+                        break;
+                }
+
+                Console.WriteLine("press enter key to continue");
+                string cont = Console.ReadLine();
+
+            } while (ExitFlag != true);
+
+        }
+
+        static void Borrow(int uid)
+        {
+            Console.Clear();
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Borrow Book\n");
+            Console.WriteLine(new string('*', 100));
+            viewAllBooks();
+
+            bool flage = false;
+            string choice;
+            Console.WriteLine("\nEnter Book ID");
+            int bid = handelIntError(Console.ReadLine());
+            var borrowBookList = borrowRepository.GetAll();
+
+            foreach (var b in borrowBookList)
+            {
+                if(b.UID == uid && b.BID == bid)
+                {
+                    if(b.IsReturned != true)
+                    {
+                        Console.WriteLine("You are still borrowed this book ..");
+                        Console.WriteLine("Do you want to borrow another book\n 1.yes\n 2.No");
+                        choice = Console.ReadLine();
+                        if (choice == "1")
+                        {
+                            Borrow(uid);
+                            flage = true;
+                        }
+                        else 
+                        {
+                            UserMenu(uid);
+                            flage = true;
+                        }
+                    }
+                    
+                }
+            }
+            if(flage != true)
+            {
+                var bokkList = bookRepository.GetAllBooks();
+                foreach (var b in bokkList)
+                {
+                    if (b.BID == bid )
+                    {
+                        if(b.BorrowedCopies < b.TotalCopies)
+                        {
+                            Console.WriteLine($"{b.BID}: {b.BTitle} - Author: {b.Author} - Copies: {b.TotalCopies} - Price {b.Price}");
+                            Console.WriteLine("\n" + b.BTitle + " is availabe.");
+                            Console.WriteLine("********************************************************************");
+                            Console.WriteLine("To confirm book borrowing press 1 ..");
+                            choice = Console.ReadLine();
+
+                            if (choice == "1")
+                            {
+                                DateTime today = DateTime.Today;
+
+                                DateTime returnD = today.AddDays(b.BorrowingPeriod);
+
+                                var borrowBook = new Borrow { BID = bid, UID = uid, BDate = today, RDate = returnD, IsReturned = false };
+                                borrowRepository.Insert(borrowBook);
+                                Console.WriteLine("Thank you..\nPlease Return it withen " + b.BorrowingPeriod + " days..\n");
+                            }
+                            else
+                            {
+                                Console.WriteLine("\tThank You..");
+                            }
+                            flage = true ;
+                        }
+                       
+                        else
+                        {
+                            Console.WriteLine("Book not availabe for Borroing.");
+                            flage = true;
+                        }
+                            
+                    }
+                }
+                if (flage != true)
+                    Console.WriteLine("Incorect Book ID .");
+
+            }
+
+        }
+
 
 
         //Handel input errors
