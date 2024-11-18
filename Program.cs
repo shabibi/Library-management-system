@@ -842,7 +842,10 @@ namespace LIBRARY
                                 DateTime returnD = today.AddDays(b.BorrowingPeriod);
 
                                 var borrowBook = new Borrow { BID = bid, UID = uid, BDate = today, RDate = returnD, IsReturned = false };
+                                var book = bookRepository.GetAllBooks().FirstOrDefault(b=> b.BID == bid);
                                 borrowRepository.Insert(borrowBook);
+                                book.BorrowedCopies += 1;
+                                bookRepository.UpdateBookByName(book.BTitle);
                                 Console.WriteLine("Thank you..\nPlease Return it withen " + b.BorrowingPeriod + " days..\n");
                             }
                             else

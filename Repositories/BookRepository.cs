@@ -93,7 +93,7 @@ namespace LIBRARY.Repositories
             var catg = _context.Categories.FirstOrDefault(b => b.CID == cid);
 
 
-            if (catg != null && catg.NumberOfBooks > 0)
+            if (catg != null)
             {
                 catg.NumberOfBooks += 1;
                 _context.Categories.Update(catg);
