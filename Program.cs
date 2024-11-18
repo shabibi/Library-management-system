@@ -867,7 +867,70 @@ namespace LIBRARY
 
         }
 
+        static void ReturnBook(int uid)
+        {
+            Console.Clear();
+            Console.WriteLine(new string('*', 100));
+            Console.WriteLine("\t\t\t\t\t\t Return Book\n");
+            Console.WriteLine(new string('*', 100));
+            bool flag = false;
+            var borrowedBook = borrowRepository.GetAll();
+            if (borrowedBook != null)
+            {
+                try
+                {
+                    Console.WriteLine("\nBooks you have borrowed .. ");
+                    Console.WriteLine(new string('*', 100));
+                    Console.WriteLine("{0,-10} {1,-30} {2,-12} {3,-12}", "Book ID", "Book Name", "Borrow Date", "Return Date");
+                    foreach (var b in borrowedBook)
+                    {
+                        if (b.UID == uid)
+                        {
+                            if (b.IsReturned != true)
+                            {
+                                Console.WriteLine("{0,-10} {1,-30} {2,-12} {3,-12}",
+                                    b.BID, b.Book.BTitle, b.BDate.ToString("yyyy-MM-dd"),
+                                    b.RDate.ToString("yyyy-MM-dd"));
+                            }
+                        }
+                    }
+                    do
+                    {
+                        Console.WriteLine(new string('*', 100));
+                        Console.WriteLine("\nEnter Book ID");
+                        int bid = handelIntError(Console.ReadLine());
+                        foreach (var b in borrowedBook)
+                        {
+                            if ((b.BID == bid) && (b.UID == uid) && (!b.IsReturned))
+                            {
+                                //update books list
+                                var book = bookRepository.GetBookByName(b.Book.BTitle);
+                                book.BorrowedCopies -= 1;
+                                bookRepository.UpdateBookByName(book.BTitle);
+                                Console.WriteLine("How would you rate the book out of 5 ?");
+                                float rate = float.Parse(Console.ReadLine());
+                                b.Rating = rate;
+                                b.ActualDate = DateTime.Now;
+                                b.IsReturned = true;
+                                borrowRepository.UpdateBorrowingByBookName(b.Book.BTitle);
 
+                                Console.WriteLine("\n" + b.Book.BTitle + " returned to the library\n\nThank you.");
+                                flag = true;
+                            }
+                        }
+
+                        if (flag != true)
+                        {
+                            Console.WriteLine("\nBook not exist..");
+                        }
+                    } while (flag != true);
+                }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                
+            }
+          
+        }
+      
 
         //Handel input errors
         static int handelIntError(string input)
